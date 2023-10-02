@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.41978818, g: 0.6303635, b: 1.215808, a: 1}
+  m_IndirectSpecularColor: {r: 0.41980773, g: 0.63037306, b: 1.2158538, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -455,10 +455,10 @@ MonoBehaviour:
   endSmoothness: 0.85
   smoothnessFadeStart: 100
   smoothnessFadeDistance: 500
-  refractionColor: {r: 1, g: 0.2028302, b: 0.96443707, a: 1}
+  refractionColor: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
   maxRefractionDistance: 0.5
   absorptionDistance: 1.5
-  scatteringColor: {r: 0.11836952, g: 0.71151155, b: 0.7169812, a: 1}
+  scatteringColor: {r: 0, g: 0.25936767, b: 0.3018868, a: 1}
   ambientScattering: 0.438
   heightScattering: 0.2
   displacementScattering: 0.1
