@@ -11,7 +11,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private float Distance;
 
-
     [Header("Values")]
     [SerializeField] private float mouseSensitivity, sprintSpeed, walkSpeed, smoothTime;
 
@@ -29,7 +28,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        HandleRotation();
         HandleMovement();
+
+    }
+
+    private void HandleRotation() 
+    {
+
     }
 
     private void HandleMovement() {
