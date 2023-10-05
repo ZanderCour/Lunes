@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.6057711, g: 0.88109887, b: 1.8558333, a: 1}
+  m_IndirectSpecularColor: {r: 0.6016627, g: 0.87286675, b: 1.8316271, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -420,12 +420,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   surfaceType: 0
   geometryType: 2
-  mesh: {fileID: 0}
+  mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
   cpuSimulation: 1
   cpuFullResolution: 0
   cpuEvaluateRipples: 0
   timeMultiplier: 1
-  repetitionSize: 500
+  repetitionSize: 750
   largeWindSpeed: 250
   largeWindOrientationValue: 0
   largeCurrentSpeedValue: 0
@@ -451,14 +451,14 @@ MonoBehaviour:
   ripplesFadeStart: 50
   ripplesFadeDistance: 200
   customMaterial: {fileID: 0}
-  startSmoothness: 0.95
-  endSmoothness: 0.85
+  startSmoothness: 0.99
+  endSmoothness: 0
   smoothnessFadeStart: 100
   smoothnessFadeDistance: 500
   refractionColor: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
   maxRefractionDistance: 0.5
   absorptionDistance: 1.5
-  scatteringColor: {r: 0.09411764, g: 0.5018891, b: 0.5372549, a: 1}
+  scatteringColor: {r: 0.19406372, g: 0.8396226, b: 0.7161311, a: 1}
   ambientScattering: 0.438
   heightScattering: 0.2
   displacementScattering: 0.1
