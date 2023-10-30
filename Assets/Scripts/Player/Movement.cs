@@ -33,6 +33,9 @@ public class Movement : MonoBehaviour
     private void Start()
     {
         controller = GetComponent<CharacterController>();
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
