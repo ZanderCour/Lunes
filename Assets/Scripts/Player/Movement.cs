@@ -1,83 +1,188 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
-public class Movement : MonoBehaviour
-{
-    [Header("Keybinds")]
-    public KeyCode jumpKey;
-    
-    CharacterController controller;
-    [SerializeField] private Transform playerCamera;
 
-    [Header("Movement")]
-    [SerializeField] private float speed;
-    [SerializeField] private float turnSmoothTime;
+public class PlayerController : MonoBehaviour
+{
+    public KeyCode jumpCode;
+    public KeyCode SprintCode;
+
+    float speed;
+    public float walkSpeed;
+    public float runSpeed;
+    public float jumpVelocity;
+    public float turnSmoothTime;
+
+
+    [Header("Info")]
+    public bool isMoving;
+    public bool isSprinting;
+    public bool isIdle;
+    [Space(15)]
+    public bool canJump;
+
+    [Header("Hidden values")]
     float turnSmoothVelocity;
 
-    [Header("Jumping")]
-    [SerializeField] private float jumpMultiplier;
+    [Header("Components")]
+    [SerializeField] private CharacterController characterController;
+    Rigidbody rb;
 
-    [Header("Axis")]
-    float Horizontal;
-    float Vertical;
+    [Header("Vectors")]
+    Vector3 moveVelocity;
+    Vector3 turnVelocity;
+    Vector3 moveDirection;
+
+    [Header("Camera")]
+    public Transform cam;
 
     [Header("Physics")]
-    public Transform groundCheck;
-    [SerializeField] private bool isGrounded;
-    public LayerMask groundLayer;
-    public float groundCheckRadius = 0.2f;
-    [SerializeField] private float gravity = -9.81f;
-    private Vector3 playerVelocity;
+    public Transform sphereTransform;
+    public bool isGrounded;
+    public float gravity;
+    public float jumpCooldown;
 
-    private void Start()
+    [Header("Animations")]
+    public float acceleration = 0.1f;
+    public float SprintAcceleration = 1f;
+    public float deceleration = 0.5f;
+    private Animator animator;
+    private float animatorFloat;
+    int VelocityHash;
+
+    [Header("bools")]
+    public bool CanMove;
+    public bool CanLogic;
+    public bool CanInput;
+    public bool CanAnimate;
+
+
+    private void Awake()
     {
-        controller = GetComponent<CharacterController>();
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+        VelocityHash = Animator.StringToHash("Velocity");
     }
 
-    private void Update()
+    public void Update()
     {
-        HandleMovement();
+        GetInput();
+        MovePlayer();
+        HandleLogic();
         HandleJumping();
-        HandlePhysics();
+        HandleAnimations();
+    }
+
+    private void MovePlayer()
+    {
+        //Gets the RAW input axises 
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+
+        if (direction.magnitude >= 0.1f) //Checks if there is a input from the player if not then dont move
+        {
+            //Handling the rotation of the player acording to the camera rotation via the Cinamachine
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+
+            if (isGrounded)
+            {
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
+
+                characterController.Move(moveDirection.normalized * speed * Time.deltaTime);
+            }
+        }
+    }
+
+    private void GetInput()
+    {
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)) { isMoving = true; }
+        else if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.D)) { isMoving = false; isSprinting = false; }
+
+        if (isMoving && Input.GetKey(SprintCode))
+        {
+            isSprinting = true;
+        }
+        else if (isMoving && !Input.GetKey(SprintCode))
+        {
+            isSprinting = false;
+        }
+
+        if (!isSprinting && !isMoving)
+        {
+            isIdle = true;
+        }
+        else
+        {
+            isIdle = false;
+        }
+    }
+
+    public void Jump()
+    {
+        moveVelocity.y = jumpVelocity;
     }
 
     private void HandleJumping()
     {
         if (isGrounded)
         {
-            if (Input.GetKeyDown(jumpKey))
+            if (Input.GetKey(jumpCode))
             {
-                playerVelocity.y = jumpMultiplier;
+                if (canJump)
+                {
+                    Jump();
+                    canJump = false;
+                }
             }
         }
+
+        moveVelocity.y += gravity * Time.deltaTime;
+        characterController.Move(moveVelocity * Time.deltaTime);
+        transform.Rotate(turnVelocity * Time.deltaTime);
     }
 
-    private void HandleMovement()
+    private void HandleLogic()
     {
-        Horizontal = Input.GetAxisRaw("Horizontal");
-        Vertical = Input.GetAxisRaw("Vertical");
-
-        Vector3 direction = new Vector3(Horizontal, 0f, Vertical).normalized;
-
-        if (direction.magnitude >= 0.1f) {
-            float targetAngle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg + playerCamera.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, targetAngle, 0);
-            Vector3 moveDir = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
-            controller.Move(moveDir * speed * Time.deltaTime);
+        float OriginalSpeed = walkSpeed;
+        if (isSprinting)
+        {
+            speed = runSpeed;
         }
+        else if (isMoving) { speed = OriginalSpeed; }
+        else if (isIdle) { speed = OriginalSpeed; }
     }
 
-    private void HandlePhysics()
+    private void HandleAnimations()
     {
-        //Gravity
-        playerVelocity.y += gravity * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
+        if (isMoving && animatorFloat < 0.2f)
+        {
+            animatorFloat += Time.deltaTime * acceleration;
+        }
+
+        if (isSprinting && animatorFloat < 1.0f)
+        {
+            animatorFloat += Time.deltaTime * acceleration;
+        }
+
+        if (!isSprinting && isMoving && animatorFloat > 0.2f)
+        {
+            animatorFloat -= Time.deltaTime * deceleration;
+        }
+
+        if (isIdle && animatorFloat > 0.0f)
+        {
+            animatorFloat -= Time.deltaTime * deceleration;
+        }
+
+        if (isMoving && animatorFloat < 0.0f)
+        {
+            animatorFloat = 0f;
+        }
+
+        animator.SetFloat(VelocityHash, animatorFloat);
     }
-
-
 }
