@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.6016627, g: 0.87286675, b: 1.8316271, a: 1}
+  m_IndirectSpecularColor: {r: 0.6026502, g: 0.8741828, b: 1.8335402, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -446,7 +446,7 @@ MonoBehaviour:
   ripplesCurrentMode: 0
   ripplesCurrentSpeedValue: 0
   ripplesCurrentOrientationValue: 0
-  ripplesChaos: 0.8
+  ripplesChaos: 0.77
   ripplesFadeToggle: 1
   ripplesFadeStart: 50
   ripplesFadeDistance: 200
@@ -458,7 +458,7 @@ MonoBehaviour:
   refractionColor: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
   maxRefractionDistance: 0.5
   absorptionDistance: 1.5
-  scatteringColor: {r: 0.19406372, g: 0.8396226, b: 0.7161311, a: 1}
+  scatteringColor: {r: 0.3915094, g: 1, b: 0.8856775, a: 1}
   ambientScattering: 0.438
   heightScattering: 0.2
   displacementScattering: 0.1
