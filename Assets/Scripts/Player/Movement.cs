@@ -37,16 +37,16 @@ public class PlayerController : MonoBehaviour
     public Transform cam;
 
     [Header("Physics")]
-    public Transform sphereTransform;
     public bool isGrounded;
     public float gravity;
     public float jumpCooldown;
 
     [Header("Animations")]
+    public Animator animator;
+    [Space(5)]
     public float acceleration = 0.1f;
     public float SprintAcceleration = 1f;
     public float deceleration = 0.5f;
-    private Animator animator;
     private float animatorFloat;
     int VelocityHash;
 
@@ -61,7 +61,6 @@ public class PlayerController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
         VelocityHash = Animator.StringToHash("Velocity");
     }
 
@@ -87,13 +86,10 @@ public class PlayerController : MonoBehaviour
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
 
-            if (isGrounded)
-            {
-                transform.rotation = Quaternion.Euler(0f, angle, 0f);
-                moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
 
-                characterController.Move(moveDirection.normalized * speed * Time.deltaTime);
-            }
+            characterController.Move(moveDirection.normalized * speed * Time.deltaTime);
         }
     }
 
