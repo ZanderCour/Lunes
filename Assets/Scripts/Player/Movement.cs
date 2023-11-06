@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     public KeyCode jumpCode;
     public KeyCode SprintCode;
+    public KeyCode vaultCode;
 
     float speed;
     public float walkSpeed;
@@ -13,20 +14,17 @@ public class PlayerController : MonoBehaviour
     public float jumpVelocity;
     public float turnSmoothTime;
 
-
     [Header("Info")]
     public bool isMoving;
     public bool isSprinting;
     public bool isIdle;
-    [Space(15)]
-    public bool canJump;
 
     [Header("Hidden values")]
     float turnSmoothVelocity;
 
     [Header("Components")]
     [SerializeField] private CharacterController characterController;
-    Rigidbody rb;
+    private Rigidbody rb;
 
     [Header("Vectors")]
     Vector3 moveVelocity;
@@ -37,31 +35,30 @@ public class PlayerController : MonoBehaviour
     public Transform cam;
 
     [Header("Physics")]
-    public bool isGrounded;
+    private bool isGrounded;
     public float gravity;
-    public float jumpCooldown;
+    public Transform groundCheck;
+    public LayerMask vaultLayer;
 
     [Header("Animations")]
     public Animator animator;
     [Space(5)]
-    public float acceleration = 0.1f;
-    public float SprintAcceleration = 1f;
-    public float deceleration = 0.5f;
-    private float animatorFloat;
-    int VelocityHash;
+    [SerializeField] private float acceleration = 0.1f;
+    [SerializeField] private float deceleration = 0.5f;
+    [SerializeField] private float animatorFloat;
 
-    [Header("bools")]
-    public bool CanMove;
-    public bool CanLogic;
-    public bool CanInput;
-    public bool CanAnimate;
+    [Header("Vaulting")]
+    public Transform vaultcheck;
+    public LayerMask groundLayer;
+    [SerializeField] private bool canVault;
+    private bool isVaulting;
+
 
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
-        VelocityHash = Animator.StringToHash("Velocity");
     }
 
     public void Update()
@@ -71,18 +68,19 @@ public class PlayerController : MonoBehaviour
         HandleLogic();
         HandleJumping();
         HandleAnimations();
+        HandleVaulting();
+
     }
 
     private void MovePlayer()
     {
-        //Gets the RAW input axises 
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f) //Checks if there is a input from the player if not then dont move
+
+        if (isMoving)
         {
-            //Handling the rotation of the player acording to the camera rotation via the Cinamachine
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
 
@@ -128,21 +126,43 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKey(jumpCode))
             {
-                if (canJump)
+                if (isGrounded)
                 {
                     Jump();
-                    canJump = false;
+                    isGrounded = false;
                 }
             }
         }
 
-        moveVelocity.y += gravity * Time.deltaTime;
-        characterController.Move(moveVelocity * Time.deltaTime);
-        transform.Rotate(turnVelocity * Time.deltaTime);
+        if (!isVaulting) {
+            moveVelocity.y += gravity * Time.deltaTime;
+            characterController.Move(moveVelocity * Time.deltaTime);
+            transform.Rotate(turnVelocity * Time.deltaTime);
+        }
+    }
+
+    private void HandleVaulting()
+    {
+        canVault = Physics.CheckSphere(vaultcheck.position, 0.5f, vaultLayer);
+
+        if (Input.GetKeyDown(vaultCode) && canVault) {
+            isVaulting = true;
+        }
+        else if(Input.GetKeyDown(vaultCode) && isVaulting) {
+            isVaulting = false;
+        }
+        else if (Input.GetKeyDown(jumpCode) && isVaulting) {
+            
+        }
+
+
+
+
     }
 
     private void HandleLogic()
     {
+        isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundLayer);
         float OriginalSpeed = walkSpeed;
         if (isSprinting)
         {
@@ -178,7 +198,5 @@ public class PlayerController : MonoBehaviour
         {
             animatorFloat = 0f;
         }
-
-        animator.SetFloat(VelocityHash, animatorFloat);
     }
 }
