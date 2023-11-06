@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.6016627, g: 0.87286675, b: 1.8316271, a: 1}
+  m_IndirectSpecularColor: {r: 0.6027656, g: 0.8742534, b: 1.8335707, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -425,7 +425,7 @@ MonoBehaviour:
   cpuFullResolution: 0
   cpuEvaluateRipples: 0
   timeMultiplier: 1
-  repetitionSize: 750
+  repetitionSize: 1857
   largeWindSpeed: 250
   largeWindOrientationValue: 0
   largeCurrentSpeedValue: 0
@@ -458,7 +458,7 @@ MonoBehaviour:
   refractionColor: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
   maxRefractionDistance: 0.5
   absorptionDistance: 1.5
-  scatteringColor: {r: 0.19406372, g: 0.8396226, b: 0.7161311, a: 1}
+  scatteringColor: {r: 0.25591847, g: 0.5396715, b: 0.6698113, a: 1}
   ambientScattering: 0.438
   heightScattering: 0.2
   displacementScattering: 0.1

@@ -48,28 +48,20 @@ public class PlayerController : MonoBehaviour
     public float SprintAcceleration = 1f;
     public float deceleration = 0.5f;
     private float animatorFloat;
-    int VelocityHash;
-
-    [Header("bools")]
-    public bool CanMove;
-    public bool CanLogic;
-    public bool CanInput;
-    public bool CanAnimate;
-
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
-        VelocityHash = Animator.StringToHash("Velocity");
     }
 
     public void Update()
     {
         GetInput();
-        MovePlayer();
         HandleLogic();
+        MovePlayer();
         HandleJumping();
+
         HandleAnimations();
     }
 
@@ -95,28 +87,10 @@ public class PlayerController : MonoBehaviour
 
     private void GetInput()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)) { isMoving = true; }
-        else if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.D)) { isMoving = false; isSprinting = false; }
-
-        if (isMoving && Input.GetKey(SprintCode))
-        {
-            isSprinting = true;
-        }
-        else if (isMoving && !Input.GetKey(SprintCode))
-        {
-            isSprinting = false;
-        }
-
-        if (!isSprinting && !isMoving)
-        {
-            isIdle = true;
-        }
-        else
-        {
-            isIdle = false;
-        }
+        isMoving = true ? (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)) : isMoving = false;
+        isSprinting = true ? Input.GetKey(SprintCode) : isSprinting = false;
+        isIdle = true ? !isSprinting && !isMoving : isIdle = false;
     }
-
     public void Jump()
     {
         moveVelocity.y = jumpVelocity;
@@ -144,12 +118,12 @@ public class PlayerController : MonoBehaviour
     private void HandleLogic()
     {
         float OriginalSpeed = walkSpeed;
-        if (isSprinting)
-        {
-            speed = runSpeed;
-        }
+
+        speed = runSpeed ?  isSprinting  speed = OriginalSpeed
+
         else if (isMoving) { speed = OriginalSpeed; }
         else if (isIdle) { speed = OriginalSpeed; }
+
     }
 
     private void HandleAnimations()
@@ -179,6 +153,7 @@ public class PlayerController : MonoBehaviour
             animatorFloat = 0f;
         }
 
-        animator.SetFloat(VelocityHash, animatorFloat);
+        animator.SetFloat("Velocity", animatorFloat);
     }
 }
+
