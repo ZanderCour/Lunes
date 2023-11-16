@@ -6,8 +6,9 @@ public class QuestManager : MonoBehaviour
     public List<Quest> quests = new List<Quest>();
     [SerializeField] private Transform player;
     Vector3 questLocation;
-    int QuestID;
+    [SerializeField] private int QuestID;
     [SerializeField] private float distance;
+    [SerializeField] private int newActiveQuest;
 
     private void Start()
     {
@@ -16,23 +17,65 @@ public class QuestManager : MonoBehaviour
 
     private void Update()
     {
-        if (quests.Count >= 1)
+        if (quests.Count > 0)
+        {
             CheckPlayerPosition(player);
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ChangeQuest(newActiveQuest);
+            Debug.Log("Tried to change quest");
+        }
     }
 
     void CheckPlayerPosition(Transform player) {
         distance = Vector3.Distance(questLocation, player.position);
         if(distance < 1) {
-            CompleteQuest("QUEST COMPLETED!");
+            if (quests.Count > 0) {
+                if (quests[QuestID].Complete == false)
+                {
+                    CompleteQuest("QUEST COMPLETED! " + QuestID);
+                }
+                else
+                {
+                    Debug.Log("Quest Failed This quest has allready been completed");
+                }
+            }
         }
     }
 
     void CompleteQuest(string message) {
+        quests[QuestID].Complete = true; 
+        CheckQuest(QuestID);
         Debug.Log(message);
-        if(quests.Count >= 1) {
-            RemoveQuest(QuestID);
+    }
+
+    void CheckQuest(int id)
+    {
+        if(id == 0)
+        {
+            AddQuest("Go to hell", 1);
         }
-        
+
+        if(id == 1)
+        {
+            AddQuest("haha lol", 2);
+        }
+
+        Debug.Log("Quests checked sucsesfully");
+    }
+
+    public void ChangeQuest(int index)
+    {
+        if(index < quests.Count) {
+            QuestID = index;
+        }
+        else
+        {
+            Debug.Log("Failed");
+        }
     }
 
     public void AddQuest(string questName, int questID)
@@ -53,8 +96,12 @@ public class QuestManager : MonoBehaviour
         newQuest.goalLocation = questLocation;
     }
 
-    public void RemoveQuest(int id)
+    public void CompleteQuest()
     {
-        quests.Remove(quests[id]);
+        if(quests.Count > 0) {
+            if(quests[QuestID] != null) {
+                quests[QuestID].Complete = true;
+            }
+        }
     }
 }

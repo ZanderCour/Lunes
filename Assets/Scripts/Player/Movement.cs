@@ -95,29 +95,40 @@ public class PlayerController : MonoBehaviour
                 float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
                 float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
 
-                transform.rotation = Quaternion.Euler(0f, angle, 0f);
-                moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
-            }
-             
-            if (isMoving && !isSprinting) {
-                if(currentSpeed < walkSpeed) {
-                    currentSpeed += LocomotionAcceleration;
+
+                if (isGrounded) {
+                    transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                    moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
                 }
-                else { currentSpeed = walkSpeed; }  
-            }
-            else if(isMoving && isSprinting) {
-                if (currentSpeed < runSpeed) {
-                    currentSpeed += LocomotionAcceleration;
-                }
-                else { currentSpeed = runSpeed; }
-            }
-            else if (isIdle) {
-                if(currentSpeed > 0) {
-                    currentSpeed -= LocomotionDecceleration;
-                }
-                else if(currentSpeed < 0) { currentSpeed = 0; }
             }
 
+            if (isGrounded)
+            {
+                if (isMoving && !isSprinting)
+                {
+                    if (currentSpeed < walkSpeed)
+                    {
+                        currentSpeed += LocomotionAcceleration;
+                    }
+                    else { currentSpeed = walkSpeed; }
+                }
+                else if (isMoving && isSprinting)
+                {
+                    if (currentSpeed < runSpeed)
+                    {
+                        currentSpeed += LocomotionAcceleration;
+                    }
+                    else { currentSpeed = runSpeed; }
+                }
+                else if (isIdle)
+                {
+                    if (currentSpeed > 0)
+                    {
+                        currentSpeed -= LocomotionDecceleration;
+                    }
+                    else if (currentSpeed < 0) { currentSpeed = 0; }
+                }
+            }
             characterController.Move(moveDirection.normalized * currentSpeed * Time.deltaTime);
         }
     }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b25bcaa7e0cf50141b60d4d1c4354353, type: 3}
   m_Name: Tutoriral
   m_EditorClassIdentifier: 
-  questName: u suk lol
+  questName: 
   goalLocation: {x: 0, y: 0, z: 0}
   questIndicator: {fileID: 0}
+  Complete: 0

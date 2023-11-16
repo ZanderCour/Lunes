@@ -10,4 +10,8 @@ public class GateController : MonoBehaviour
     [Header("Player")]
     public GameObject Player;
 
+    private void Update() {
+        
+    }
+
 }

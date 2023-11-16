@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Object
+  - Quest
   layers:
   - Default
   - TransparentFX
