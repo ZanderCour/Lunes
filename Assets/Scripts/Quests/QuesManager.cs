@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using System;
 
 public class QuestManager : MonoBehaviour
 {
@@ -9,10 +11,25 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private int QuestID;
     [SerializeField] private float distance;
     [SerializeField] private int newActiveQuest;
+    public GameObject questButtonPrefab;
+    public Transform questUIRect;
+    
 
     private void Start()
     {
         AddQuest("Tutorial", 0);
+        AddQuest("haha lol", 1);
+        AddQuest("soi dora", 3);
+        AddQuest("spider boi", 4);
+        AddQuest("bruh", 5);
+        AddQuest("pepega", 6);
+
+
+
+        if (quests.Count > 0)
+        {
+            HandleUI();
+        }
     }
 
     private void Update()
@@ -52,19 +69,43 @@ public class QuestManager : MonoBehaviour
         Debug.Log(message);
     }
 
+
+
     void CheckQuest(int id)
     {
         if(id == 0)
         {
-            AddQuest("Go to hell", 1);
+
         }
 
         if(id == 1)
         {
-            AddQuest("haha lol", 2);
+
         }
 
         Debug.Log("Quests checked sucsesfully");
+    }
+
+
+    public void HandleUI()
+    {
+        for(int i = 0; i < quests.Count; i++)
+        {
+            try 
+            {
+                var Button = Instantiate(questButtonPrefab, questUIRect.position, Quaternion.identity);
+                Button.transform.parent = questUIRect.transform;
+                Button.transform.localScale = Vector3.one;
+                TextMeshProUGUI questText = Button.GetComponentInChildren<TextMeshProUGUI>();
+                
+                questText.text = quests[i].questName;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+
+        }
     }
 
     public void ChangeQuest(int index)
