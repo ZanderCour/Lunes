@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.UI;
 
 public class QuestManager : MonoBehaviour
 {
@@ -17,14 +18,9 @@ public class QuestManager : MonoBehaviour
 
     private void Start()
     {
-        AddQuest("Tutorial", 0);
-        AddQuest("haha lol", 1);
-        AddQuest("soi dora", 3);
-        AddQuest("spider boi", 4);
-        AddQuest("bruh", 5);
-        AddQuest("pepega", 6);
-
-
+        AddQuest("Tutorial_0", 0);
+        AddQuest("Tutorial_1", 1);
+        
 
         if (quests.Count > 0)
         {
@@ -44,6 +40,14 @@ public class QuestManager : MonoBehaviour
         {
             ChangeQuest(newActiveQuest);
             Debug.Log("Tried to change quest");
+        }
+    }
+
+    private void HandleButtonId()
+    {
+        for(int i = 0; i < quests.Count; i++) {
+            QuestButton[] buttons = FindObjectsOfType<QuestButton>();
+
         }
     }
 
@@ -93,12 +97,14 @@ public class QuestManager : MonoBehaviour
         {
             try 
             {
-                var Button = Instantiate(questButtonPrefab, questUIRect.position, Quaternion.identity);
-                Button.transform.parent = questUIRect.transform;
-                Button.transform.localScale = Vector3.one;
-                TextMeshProUGUI questText = Button.GetComponentInChildren<TextMeshProUGUI>();
-                
+                var ButtonPrefab = Instantiate(questButtonPrefab, questUIRect.position, Quaternion.identity);
+                ButtonPrefab.transform.parent = questUIRect.transform;
+                ButtonPrefab.transform.localScale = Vector3.one;
+                TextMeshProUGUI questText = ButtonPrefab.GetComponentInChildren<TextMeshProUGUI>();
+                QuestButton UIButton = ButtonPrefab.GetComponent<QuestButton>();
+                UIButton.SetButton(i);
                 questText.text = quests[i].questName;
+                
             }
             catch (Exception e)
             {
