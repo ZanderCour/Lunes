@@ -6,27 +6,28 @@ public class PlayerController : MonoBehaviour
 {
     public KeyCode jumpCode;
     public KeyCode SprintCode;
+    public KeyCode vaultCode;
 
-    float speed;
-    public float walkSpeed;
-    public float runSpeed;
+    [Header("Movement")]
+    [SerializeField] private float LocomotionAcceleration;
+    [SerializeField] private float LocomotionDecceleration;
+    [SerializeField] private float currentSpeed;
+    [SerializeField] private float walkSpeed;
+    [SerializeField] private float runSpeed;
     public float jumpVelocity;
     public float turnSmoothTime;
-
 
     [Header("Info")]
     public bool isMoving;
     public bool isSprinting;
     public bool isIdle;
-    [Space(15)]
-    public bool canJump;
 
     [Header("Hidden values")]
     float turnSmoothVelocity;
 
     [Header("Components")]
     [SerializeField] private CharacterController characterController;
-    Rigidbody rb;
+    private Rigidbody rb;
 
     [Header("Vectors")]
     Vector3 moveVelocity;
@@ -37,59 +38,98 @@ public class PlayerController : MonoBehaviour
     public Transform cam;
 
     [Header("Physics")]
-    public bool isGrounded;
+    private bool isGrounded;
     public float gravity;
-    public float jumpCooldown;
+    public Transform groundCheck;
+    public LayerMask vaultLayer;
+    public LayerMask wallLayer;
 
     [Header("Animations")]
     public Animator animator;
     [Space(5)]
-    public float acceleration = 0.1f;
-    public float SprintAcceleration = 1f;
-    public float deceleration = 0.5f;
-    private float animatorFloat;
-    int VelocityHash;
+    [SerializeField] private float acceleration = 0.1f;
+    [SerializeField] private float deceleration = 0.5f;
+    [SerializeField] private float animatorFloat;
 
-    [Header("bools")]
-    public bool CanMove;
-    public bool CanLogic;
-    public bool CanInput;
-    public bool CanAnimate;
-
+    [Header("Vaulting")]
+    public Transform Headcheck;
+    public Transform FootCheck;
+    public LayerMask groundLayer;
+    [SerializeField] private bool canVault;
+    private bool isVaulting;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
-        VelocityHash = Animator.StringToHash("Velocity");
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Update()
     {
         GetInput();
-        MovePlayer();
+        if (!isVaulting)
+            MovePlayer();
+
         HandleLogic();
-        HandleJumping();
+        if (!isVaulting)
+            HandleJumping();
+
         HandleAnimations();
+        HandleVaulting();
+
     }
 
     private void MovePlayer()
     {
-        //Gets the RAW input axises 
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f) //Checks if there is a input from the player if not then dont move
+        if(!isVaulting)
         {
-            //Handling the rotation of the player acording to the camera rotation via the Cinamachine
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            if (isMoving)
+            {
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
 
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-            moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
 
-            characterController.Move(moveDirection.normalized * speed * Time.deltaTime);
+                if (isGrounded) {
+                    transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                    moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward.normalized;
+                }
+            }
+
+            if (isGrounded)
+            {
+                if (isMoving && !isSprinting)
+                {
+                    if (currentSpeed < walkSpeed)
+                    {
+                        currentSpeed += LocomotionAcceleration;
+                    }
+                    else { currentSpeed = walkSpeed; }
+                }
+                else if (isMoving && isSprinting)
+                {
+                    if (currentSpeed < runSpeed)
+                    {
+                        currentSpeed += LocomotionAcceleration;
+                    }
+                    else { currentSpeed = runSpeed; }
+                }
+                else if (isIdle)
+                {
+                    if (currentSpeed > 0)
+                    {
+                        currentSpeed -= LocomotionDecceleration;
+                    }
+                    else if (currentSpeed < 0) { currentSpeed = 0; }
+                }
+            }
+            characterController.Move(moveDirection.normalized * currentSpeed * Time.deltaTime);
         }
     }
 
@@ -128,28 +168,43 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKey(jumpCode))
             {
-                if (canJump)
-                {
-                    Jump();
-                    canJump = false;
-                }
+                Jump();
+                isGrounded = false;
             }
         }
 
-        moveVelocity.y += gravity * Time.deltaTime;
+        if (!isVaulting) {
+            moveVelocity.y += gravity * Time.deltaTime;
+            transform.Rotate(turnVelocity * Time.deltaTime);
+        }
+
         characterController.Move(moveVelocity * Time.deltaTime);
-        transform.Rotate(turnVelocity * Time.deltaTime);
+    }
+    [SerializeField] private bool Null = false;
+    private void HandleVaulting()
+    {
+        canVault = Physics.CheckSphere(Headcheck.position, 0.25f, vaultLayer);
+        Null = !Physics.CheckSphere(FootCheck.position, 0.25f, wallLayer);
+
+        if (Input.GetKeyDown(vaultCode) && canVault) {
+            isVaulting = true;
+        }
+
+        if (Null) {
+            isVaulting = false;
+        }
+        else if(isVaulting) {
+            characterController.Move(moveDirection.normalized * walkSpeed * 1.5f * Time.deltaTime);
+        }
+
+        if (isVaulting) {
+            characterController.Move(transform.up.normalized * walkSpeed * Time.deltaTime);
+        }
     }
 
     private void HandleLogic()
     {
-        float OriginalSpeed = walkSpeed;
-        if (isSprinting)
-        {
-            speed = runSpeed;
-        }
-        else if (isMoving) { speed = OriginalSpeed; }
-        else if (isIdle) { speed = OriginalSpeed; }
+        isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundLayer);
     }
 
     private void HandleAnimations()
@@ -178,7 +233,5 @@ public class PlayerController : MonoBehaviour
         {
             animatorFloat = 0f;
         }
-
-        animator.SetFloat(VelocityHash, animatorFloat);
     }
 }
