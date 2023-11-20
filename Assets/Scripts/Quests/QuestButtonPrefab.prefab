@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: -1652223501704713192}
   m_Layer: 0
   m_Name: QuestButtonPrefab
-  m_TagString: Untagged
+  m_TagString: QButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class QuestManager : MonoBehaviour
 {
+    public List<Quest> QuestDatabase = new List<Quest>();
+
     public List<Quest> quests = new List<Quest>();
     [SerializeField] private Transform player;
     Vector3 questLocation;
@@ -13,17 +15,13 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private float distance;
     public GameObject questButtonPrefab;
     public Transform questUIRect;
+    public TextMeshProUGUI QuestInfo;
     
 
     private void Start()
     {
-        AddQuest("Quest 1", 0, Quest.QuestType.story);
-        AddQuest("Quest 2", 1, Quest.QuestType.main);
-        AddQuest("Quest 3", 2, Quest.QuestType.extra);
-        AddQuest("Quest 4", 3, Quest.QuestType.tutorial);
-        AddQuest("Quest 5", 4, Quest.QuestType.story);
-        AddQuest("Quest 6", 5, Quest.QuestType.main);
-        AddQuest("Quest 7", 6, Quest.QuestType.extra);
+        AddQuest(0);
+        AddQuest(1);
 
         if (quests.Count > 0)
         {
@@ -36,6 +34,7 @@ public class QuestManager : MonoBehaviour
         if (quests.Count > 0)
         {
             CheckPlayerPosition(player);
+            HandleButtons();
         }
     }
 
@@ -78,6 +77,28 @@ public class QuestManager : MonoBehaviour
         Debug.Log("Quests checked sucsesfully");
     }
 
+    private void HandleButtons()
+    {
+        try
+        {
+            Button[] buttons = GameObject.FindWithTag("QButton").GetComponents<Button>();
+            for (int i = 0; i < quests.Count; i++)
+            {
+                if (quests[i].Complete == true)
+                {
+                    buttons[i].interactable = false;
+                }
+                else
+                {
+                    buttons[i].interactable = true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+    }
 
     public void HandleUI()
     {
@@ -91,8 +112,6 @@ public class QuestManager : MonoBehaviour
                 ButtonPrefab.transform.localScale = Vector3.one;
                 QuestButton UIButton = ButtonPrefab.GetComponent<QuestButton>();
 
-
-
                 //Find quest name text
                 TextMeshProUGUI questText = UIButton.buttonText[0];
                 questText.text = quests[i].questName;
@@ -101,8 +120,6 @@ public class QuestManager : MonoBehaviour
                 TextMeshProUGUI questTypeText = UIButton.buttonText[1];
                 string type = quests[i].type.ToString();
                 questTypeText.text = "" + type + " quest";
-
-
 
                 //Set the quest id of the button via listener
                 UIButton.SetButton(i);
@@ -113,6 +130,11 @@ public class QuestManager : MonoBehaviour
             }
 
         }
+    }
+
+    public void UpdateQuestInformation(int id)
+    {
+        QuestInfo.text = quests[id].QuestInformation;
     }
 
     public void ChangeQuest(int index)
@@ -136,34 +158,33 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    public void AddQuest(string questName, int questID, Quest.QuestType type)
+    public void AddQuest(int questID)
     {
-        ActiveQuestID = questID;
-        questLocation = Vector3.zero;
-        QuestObject[] Quests = FindObjectsOfType<QuestObject>();
-        for(int i = 0; i < Quests.Length; i++) {
-            if (Quests[i].questID == questID)
-            {
-                questLocation = Quests[i].GetComponent<Transform>().position;
-            }
-        }
-
-        //Setup information
         try
         {
-            Quest newQuest = ScriptableObject.CreateInstance<Quest>();
-            quests.Add(newQuest);
-            newQuest.questName = questName;
-            newQuest.goalLocation = questLocation;
-            newQuest.type = type;
-            
+            for(int i = 0; i < QuestDatabase.Count; i++)
+            {
+                if(QuestDatabase[i].QuestID == questID)
+                {
+                    quests.Add(QuestDatabase[i]);
+                    ActiveQuestID = i;
+                }
+            }
+
+            //QuestLocation
+            QuestObject[] Quests = FindObjectsOfType<QuestObject>();
+            for (int i = 0; i < Quests.Length; i++)
+            {
+                if (Quests[i].questID == questID)
+                {
+                    quests[questID].goalLocation = Quests[i].GetComponent<Transform>().position;
+                }
+            }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             Debug.Log(e);
         }
-
-
     }
 
     public void CompleteQuest()

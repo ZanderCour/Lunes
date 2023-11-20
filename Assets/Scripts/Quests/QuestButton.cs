@@ -21,7 +21,12 @@ public class QuestButton : MonoBehaviour
         {
             ButtonID = id;
             Button button = GetComponent<Button>();
-            button.onClick.AddListener(() => ChangeQuest(ButtonID));
+            Button TraceButton = GameObject.FindWithTag("Trace").GetComponent<Button>();
+
+
+            button.onClick.AddListener(() => UpdateInfo(ButtonID));
+            TraceButton.onClick.AddListener(() => ChangeQuest(ButtonID));
+
         }
         catch (Exception e)
         {
@@ -29,8 +34,16 @@ public class QuestButton : MonoBehaviour
         }
     }
 
+
+
     public void ChangeQuest(int index) {
         questManager.ChangeQuest(index);
+    }
+
+
+
+    public void UpdateInfo(int index) {
+        questManager.UpdateQuestInformation(index);
     }
 
 }

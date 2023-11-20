@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b25bcaa7e0cf50141b60d4d1c4354353, type: 3}
-  m_Name: Dummy
+  m_Name: Dummy_0
   m_EditorClassIdentifier: 
-  questName: 
-  goalLocation: {x: 0, y: 0, z: 0}
-  questIndicator: {fileID: 0}
+  questName: Dummy_0
+  goalLocation: {x: 11.26, y: 0.18, z: 1.52}
   Complete: 0
-  type: 0
+  QuestInformation: Testing quest there is nothing special here just a placeholder
+    quest for testing :))
+  QuestID: 0
+  type: 3
