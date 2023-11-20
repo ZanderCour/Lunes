@@ -7,4 +7,14 @@ public class Quest : ScriptableObject
     public Vector3 goalLocation;
     public Sprite questIndicator;
     public bool Complete = false;
+
+    public enum QuestType
+    {
+        story,
+        main,
+        extra,
+        tutorial
+    };
+
+    public QuestType type = new QuestType();
 }

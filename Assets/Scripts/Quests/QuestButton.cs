@@ -10,6 +10,7 @@ public class QuestButton : MonoBehaviour
 {
     private QuestManager questManager;
     [SerializeField] private int ButtonID;
+    public TextMeshProUGUI[] buttonText;
 
     private void Awake() {
         questManager = FindObjectOfType<QuestManager>();
@@ -19,7 +20,6 @@ public class QuestButton : MonoBehaviour
         try
         {
             ButtonID = id;
-            Debug.Log("Setup Triggered");
             Button button = GetComponent<Button>();
             button.onClick.AddListener(() => ChangeQuest(ButtonID));
         }
@@ -31,7 +31,6 @@ public class QuestButton : MonoBehaviour
 
     public void ChangeQuest(int index) {
         questManager.ChangeQuest(index);
-        Debug.Log("Quest changed " + index);
     }
 
 }

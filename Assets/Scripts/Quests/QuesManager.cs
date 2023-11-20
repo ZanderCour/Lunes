@@ -9,18 +9,21 @@ public class QuestManager : MonoBehaviour
     public List<Quest> quests = new List<Quest>();
     [SerializeField] private Transform player;
     Vector3 questLocation;
-    [SerializeField] private int QuestID;
+    [SerializeField] private int ActiveQuestID;
     [SerializeField] private float distance;
-    [SerializeField] private int newActiveQuest;
     public GameObject questButtonPrefab;
     public Transform questUIRect;
     
 
     private void Start()
     {
-        AddQuest("Tutorial_0", 0);
-        AddQuest("Tutorial_1", 1);
-        
+        AddQuest("Quest 1", 0, Quest.QuestType.story);
+        AddQuest("Quest 2", 1, Quest.QuestType.main);
+        AddQuest("Quest 3", 2, Quest.QuestType.extra);
+        AddQuest("Quest 4", 3, Quest.QuestType.tutorial);
+        AddQuest("Quest 5", 4, Quest.QuestType.story);
+        AddQuest("Quest 6", 5, Quest.QuestType.main);
+        AddQuest("Quest 7", 6, Quest.QuestType.extra);
 
         if (quests.Count > 0)
         {
@@ -34,30 +37,15 @@ public class QuestManager : MonoBehaviour
         {
             CheckPlayerPosition(player);
         }
-
-
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            ChangeQuest(newActiveQuest);
-            Debug.Log("Tried to change quest");
-        }
-    }
-
-    private void HandleButtonId()
-    {
-        for(int i = 0; i < quests.Count; i++) {
-            QuestButton[] buttons = FindObjectsOfType<QuestButton>();
-
-        }
     }
 
     void CheckPlayerPosition(Transform player) {
         distance = Vector3.Distance(questLocation, player.position);
         if(distance < 1) {
             if (quests.Count > 0) {
-                if (quests[QuestID].Complete == false)
+                if (quests[ActiveQuestID].Complete == false)
                 {
-                    CompleteQuest("QUEST COMPLETED! " + QuestID);
+                    CompleteQuest("QUEST COMPLETED! " + ActiveQuestID);
                 }
                 else
                 {
@@ -68,8 +56,8 @@ public class QuestManager : MonoBehaviour
     }
 
     void CompleteQuest(string message) {
-        quests[QuestID].Complete = true; 
-        CheckQuest(QuestID);
+        quests[ActiveQuestID].Complete = true; 
+        CheckQuest(ActiveQuestID);
         Debug.Log(message);
     }
 
@@ -97,14 +85,27 @@ public class QuestManager : MonoBehaviour
         {
             try 
             {
+                //Instantiate button
                 var ButtonPrefab = Instantiate(questButtonPrefab, questUIRect.position, Quaternion.identity);
                 ButtonPrefab.transform.parent = questUIRect.transform;
                 ButtonPrefab.transform.localScale = Vector3.one;
-                TextMeshProUGUI questText = ButtonPrefab.GetComponentInChildren<TextMeshProUGUI>();
                 QuestButton UIButton = ButtonPrefab.GetComponent<QuestButton>();
-                UIButton.SetButton(i);
+
+
+
+                //Find quest name text
+                TextMeshProUGUI questText = UIButton.buttonText[0];
                 questText.text = quests[i].questName;
-                
+
+                //Find quest type text
+                TextMeshProUGUI questTypeText = UIButton.buttonText[1];
+                string type = quests[i].type.ToString();
+                questTypeText.text = "" + type + " quest";
+
+
+
+                //Set the quest id of the button via listener
+                UIButton.SetButton(i);
             }
             catch (Exception e)
             {
@@ -117,7 +118,17 @@ public class QuestManager : MonoBehaviour
     public void ChangeQuest(int index)
     {
         if(index < quests.Count) {
-            QuestID = index;
+            try
+            {
+                QuestObject[] Quests = FindObjectsOfType<QuestObject>();
+                ActiveQuestID = index;
+                questLocation = Quests[index].GetComponent<Transform>().position;
+                Debug.Log("Active quest changed to : " + index);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
         }
         else
         {
@@ -125,9 +136,9 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    public void AddQuest(string questName, int questID)
+    public void AddQuest(string questName, int questID, Quest.QuestType type)
     {
-        QuestID = questID;
+        ActiveQuestID = questID;
         questLocation = Vector3.zero;
         QuestObject[] Quests = FindObjectsOfType<QuestObject>();
         for(int i = 0; i < Quests.Length; i++) {
@@ -137,17 +148,29 @@ public class QuestManager : MonoBehaviour
             }
         }
 
-        Quest newQuest = ScriptableObject.CreateInstance<Quest>();
-        quests.Add(newQuest);
-        newQuest.questName = questName;
-        newQuest.goalLocation = questLocation;
+        //Setup information
+        try
+        {
+            Quest newQuest = ScriptableObject.CreateInstance<Quest>();
+            quests.Add(newQuest);
+            newQuest.questName = questName;
+            newQuest.goalLocation = questLocation;
+            newQuest.type = type;
+            
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+
+
     }
 
     public void CompleteQuest()
     {
         if(quests.Count > 0) {
-            if(quests[QuestID] != null) {
-                quests[QuestID].Complete = true;
+            if(quests[ActiveQuestID] != null) {
+                quests[ActiveQuestID].Complete = true;
             }
         }
     }
