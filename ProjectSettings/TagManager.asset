@@ -8,6 +8,8 @@ TagManager:
   - Quest
   - Trace
   - QButton
+  - Humanoid
+  - End
   layers:
   - Default
   - TransparentFX
@@ -17,9 +19,9 @@ TagManager:
   - UI
   - Vaultable
   - Player
-  - 
-  - 
-  - 
+  - Ground
+  - Weapon
+  - NPC
   - 
   - 
   - 

@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.UI;
+using System.Collections;
 
 public class QuestManager : MonoBehaviour
 {
@@ -16,17 +17,34 @@ public class QuestManager : MonoBehaviour
     public GameObject questButtonPrefab;
     public Transform questUIRect;
     public TextMeshProUGUI QuestInfo;
+<<<<<<< HEAD:Assets/Scripts/Quests/QuestManager.cs
+    public List<Button> questButtons = new List<Button>();
+    [SerializeField] private bool IsClose;
+    [HideInInspector] bool calledFirstTime;
+    public int viewedQuest;
+
+=======
     
+>>>>>>> parent of 1783e75 (Character og oprydet i filer):Assets/Scripts/Quests/QuesManager.cs
 
     private void Start()
     {
         AddQuest(0);
         AddQuest(1);
+<<<<<<< HEAD:Assets/Scripts/Quests/QuestManager.cs
+        StartCoroutine(Setup());
+    }
+
+    private IEnumerator Setup() {
+        yield return new WaitForSeconds(1f);
+        UpdateUI();
+=======
 
         if (quests.Count > 0)
         {
             HandleUI();
         }
+>>>>>>> parent of 1783e75 (Character og oprydet i filer):Assets/Scripts/Quests/QuesManager.cs
     }
 
     private void Update()
@@ -35,7 +53,13 @@ public class QuestManager : MonoBehaviour
         {
             CheckPlayerPosition(player);
             HandleButtons();
+
         }
+    }
+
+    public void UpdateUI()
+    {
+        HandleUI();
     }
 
     void CheckPlayerPosition(Transform player) {
@@ -100,8 +124,21 @@ public class QuestManager : MonoBehaviour
         }
     }
 
+    void ClearUI()
+    {
+        questButtons.Clear();
+        QuestButton[] QuestButtonsScripts = FindObjectsOfType<QuestButton>();
+        for (int i = 0; i < QuestButtonsScripts.Length; i++)
+        {
+            Destroy(QuestButtonsScripts[i].gameObject);
+
+        }
+
+    }
+
     public void HandleUI()
     {
+        ClearUI();
         for(int i = 0; i < quests.Count; i++)
         {
             try 
@@ -139,6 +176,9 @@ public class QuestManager : MonoBehaviour
 
     public void ChangeQuest(int index)
     {
+<<<<<<< HEAD:Assets/Scripts/Quests/QuestManager.cs
+        try
+=======
         if(index < quests.Count) {
             try
             {
@@ -153,9 +193,20 @@ public class QuestManager : MonoBehaviour
             }
         }
         else
+>>>>>>> parent of 1783e75 (Character og oprydet i filer):Assets/Scripts/Quests/QuesManager.cs
         {
-            Debug.Log("Failed");
+            ActiveQuestID = index;
+
+            Debug.Log("Active quest changed to : " + index);
+            QuestObject[] Quests = FindObjectsOfType<QuestObject>();
+            questLocation = Quests[index].GetComponent<Transform>().position;
+            calledFirstTime = true;
         }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+
     }
 
     public void AddQuest(int questID)
@@ -167,6 +218,11 @@ public class QuestManager : MonoBehaviour
                 if(QuestDatabase[i].QuestID == questID)
                 {
                     quests.Add(QuestDatabase[i]);
+<<<<<<< HEAD:Assets/Scripts/Quests/QuestManager.cs
+                    quests[i].Complete = false;
+                    ChangeQuest(i);
+=======
+>>>>>>> parent of 1783e75 (Character og oprydet i filer):Assets/Scripts/Quests/QuesManager.cs
                     ActiveQuestID = i;
                 }
             }

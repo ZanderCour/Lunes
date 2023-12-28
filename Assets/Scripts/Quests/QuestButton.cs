@@ -11,6 +11,7 @@ public class QuestButton : MonoBehaviour
     private QuestManager questManager;
     [SerializeField] private int ButtonID;
     public TextMeshProUGUI[] buttonText;
+    int viewedQuest;
 
     private void Awake() {
         questManager = FindObjectOfType<QuestManager>();
@@ -25,7 +26,7 @@ public class QuestButton : MonoBehaviour
 
 
             button.onClick.AddListener(() => UpdateInfo(ButtonID));
-            TraceButton.onClick.AddListener(() => ChangeQuest(ButtonID));
+            TraceButton.onClick.AddListener(() => ChangeQuest());
 
         }
         catch (Exception e)
@@ -36,14 +37,17 @@ public class QuestButton : MonoBehaviour
 
 
 
-    public void ChangeQuest(int index) {
-        questManager.ChangeQuest(index);
+    public void ChangeQuest() {
+        questManager.ChangeQuest(questManager.viewedQuest);
     }
 
 
 
     public void UpdateInfo(int index) {
         questManager.UpdateQuestInformation(index);
+        viewedQuest = index;
+        questManager.viewedQuest = viewedQuest;
+        Debug.Log(viewedQuest);
     }
 
 }
