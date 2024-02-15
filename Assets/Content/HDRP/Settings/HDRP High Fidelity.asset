@@ -15,7 +15,7 @@ MonoBehaviour:
   m_RenderPipelineSettings:
     supportShadowMask: 0
     supportSSR: 1
-    supportSSRTransparent: 0
+    supportSSRTransparent: 1
     supportSSAO: 1
     supportSSGI: 1
     supportSubsurfaceScattering: 1
@@ -74,8 +74,8 @@ MonoBehaviour:
       reflectionCacheCompressed: 1
       reflectionProbeFormat: 74
       reflectionProbeTexCacheSize: 4096
-      reflectionProbeTexLastValidCubeMip: 3
-      reflectionProbeTexLastValidPlanarMip: 0
+      reflectionProbeTexLastValidCubeMip: 4
+      reflectionProbeTexLastValidPlanarMip: 4
       reflectionProbeDecreaseResToFit: 1
       skyReflectionSize: 1024
       skyLightingOverrideLayerMask:

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff2d0016fb1e03f459424d341004e748, type: 3}
+  m_Name: Jonas
+  m_EditorClassIdentifier: 
+  characterName: Jonas
+  dialogText:
+  - Yeah what's the deal?
+  - So its you huh...
+  - Allright so the deal is take this job and transport the demi to a safer place?
+  - Sure i'll make sure its yours
+  addQuest: 0
+  AddQuestIndex: 0
+  NpcCancompleteQuest: 1
+  QuestIndex: 0

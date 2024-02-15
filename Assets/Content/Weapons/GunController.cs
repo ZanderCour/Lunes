@@ -1,10 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class GunController : MonoBehaviour
 {
+    [Header("Settings")]
     public KeyCode FireKey;
+    public float recoilLerpSpeed = 5f;
+    public Transform gunRoot;
+    public Camera cam;
+
+    public CinemachineImpulseSource impulseSource;
+
+    public GameObject target;
+    public GameObject hitPrefab;
 
     public GunClass[] ClassLibary;
     public GunClass Class;
@@ -14,19 +24,22 @@ public class GunController : MonoBehaviour
     private float fireRate;
     private float reloadTime;
     private int damage;
-    private float recoil;
+    private Vector3 recoilPattern;
     private float shake;
     private bool Automatic;
+    private bool Hitscan;
     private float bulletSpeed;
 
     private ParticleSystem muzzleFlash;
     private AudioClip sound;
     private GameObject bullet;
-
     private GameObject WeaponPrefab;
-    public Transform end;
 
     private float nextFireTime = 0f;
+    public bool isShooting;
+    bool canShoot;
+    private Quaternion accumulatedRecoilRotation = Quaternion.identity;
+
 
     private void Start()
     {
@@ -39,7 +52,7 @@ public class GunController : MonoBehaviour
         fireRate = Class.fireRate;
         reloadTime = Class.reloadTime;
         damage = Class.damage;
-        recoil = Class.recoil;
+        recoilPattern = Class.recoilPattern;
         shake = Class.shake;
         Automatic = Class.Automatic;
         bulletSpeed = Class.bulletSpeed;
@@ -49,46 +62,85 @@ public class GunController : MonoBehaviour
         bullet = Class.bullet;
 
         WeaponPrefab = Class.WeaponPrefab;
-        end = GameObject.FindWithTag("End").transform;
     }
 
     private void Update()
     {
+        isShooting = Input.GetKey(FireKey);
+        canShoot = Time.time > nextFireTime;
+
         if (Automatic)
         {
-            if (Input.GetKeyDown(FireKey) && Time.time > nextFireTime)
+            if (Input.GetKeyDown(FireKey) && canShoot)
             {
                 Fire();
-                nextFireTime = Time.time + fireRate;
             }
         }
         else
         {
-            // Check for automatic firing
-            if (Input.GetKey(FireKey) && Time.time > nextFireTime)
+            if (Input.GetKey(FireKey) && canShoot)
             {
                 Fire();
-                nextFireTime = Time.time + fireRate;
             }
+        }
+
+        HandleTarget();
+        HandleRecoil();
+
+    }
+
+    private void HandleTarget()
+    {
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit raycastHit))
+        {
+            target.transform.position = raycastHit.point;
+            Debug.DrawRay(cam.transform.position, cam.transform.forward, Color.red);
         }
     }
 
     private void Fire()
     {
-        GameObject obj = Instantiate(bullet, end.position, end.rotation);
-        obj.GetComponent<Rigidbody>().AddForce(end.transform.forward * bulletSpeed, ForceMode.Impulse);
-        Destroy(obj, 10);
+        Vector3 shootingDirection = gunRoot.forward;
+        GameObject projectile = Instantiate(bullet, gunRoot.position, gunRoot.rotation);
 
-        //AudioSource.PlayClipAtPoint(sound, transform.position);
+        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+        projectileRb.velocity = shootingDirection * bulletSpeed;
 
 
-        ApplyRecoil();
+
+        Bullet bulletScript = projectile.GetComponent<Bullet>();
+        bulletScript.Damage = damage;
+
+        nextFireTime = Time.time + fireRate;
+
     }
 
-    private void ApplyRecoil()
+    private void HandleRecoil()
     {
-        // Apply recoil force
-        transform.Translate(Vector3.back * recoil);
-    }
+        if (isShooting && canShoot) 
+        {
+            // Apply recoil rotation on the gunRoot
+            float recoilPitch = Random.Range(-recoilPattern.x, recoilPattern.x);
+            float recoilYaw = Random.Range(-recoilPattern.y, recoilPattern.y);
+            float recoilRoll = Random.Range(-recoilPattern.z, recoilPattern.z);
 
+            Quaternion recoilRotation = Quaternion.Euler(recoilPitch, recoilYaw, recoilRoll);
+            accumulatedRecoilRotation *= recoilRotation;
+
+            accumulatedRecoilRotation = Quaternion.Lerp(accumulatedRecoilRotation, Quaternion.identity, Time.deltaTime * recoilLerpSpeed);
+
+            float recoilForce = Random.Range(shake, shake + 0.75f);
+            Vector3 totalRecoilForce = recoilForce * accumulatedRecoilRotation.eulerAngles.normalized;
+            // Generate impulse with force on the gunRoot
+            impulseSource.GenerateImpulseWithVelocity(totalRecoilForce);
+        }
+        else if(!isShooting) 
+        {
+            accumulatedRecoilRotation = Quaternion.Lerp(accumulatedRecoilRotation, Quaternion.identity, Time.deltaTime * recoilLerpSpeed);
+        }
+
+        gunRoot.localRotation = accumulatedRecoilRotation;
+
+    }
 }

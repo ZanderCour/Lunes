@@ -19,7 +19,9 @@ public class DialogManager : MonoBehaviour
     [Header("Interaction")]
     [SerializeField] private float reachDistance;
     public LayerMask NPC;
-    public Camera cam;
+    public Transform Point;
+
+
 
     private void Start()
     {
@@ -36,7 +38,6 @@ public class DialogManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F) && DialogActive) {
             DisplayNextPage();
-            page = page + 1;
         }
 
         _UIManager.DialogMenuOpen = DialogActive;
@@ -44,8 +45,9 @@ public class DialogManager : MonoBehaviour
 
     private void HandleInteraction()
     {
+        Vector3 forward = Point.TransformDirection(Vector3.forward) * reachDistance;
         RaycastHit hit;
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, reachDistance, NPC))
+        if (Physics.Raycast(Point.position, Point.forward, out hit, reachDistance, NPC))
         {
             NpcController NPC = hit.collider.GetComponent<NpcController>();
 
@@ -55,51 +57,50 @@ public class DialogManager : MonoBehaviour
                 StartDialog(Dialog);
             }
         }
-
-        Vector3 forward = cam.transform.TransformDirection(Vector3.forward) * reachDistance;
-        Debug.DrawRay(cam.transform.position, forward, Color.green);
+        
+        Debug.DrawRay(Point.position, forward, Color.green);
     }
 
     public void StartDialog(DialogSO dialog)
     {
-        page = 0;
+        page = 1;
         DialogActive = true;
         _UIManager.OpenMenuSingle(dialogMenu);
-
-        DisplayNextPage();
     }
 
     public void DisplayNextPage()
     {
-        if (Dialog.dialogText.Length > 0 && page != Dialog.dialogText.Length)
+        if (Dialog.dialogText.Length > 0)
         {
-            string currentPage = Dialog.dialogText[page]; 
-            dialogText.text = currentPage;
+            page += 1;
+
+            if (page == Dialog.dialogText.Length)
+            {
+                EndDialog();
+            }
+            else
+            {
+                string currentPage = Dialog.dialogText[page];
+                dialogText.text = currentPage;
+            }
         }
         else
         {
             Debug.Log("No dialog to download");
         }
 
-        if(page == Dialog.dialogText.Length)
-        {
-            EndDialog();
-        }
     }
 
     private void EndDialog()
     {
         Debug.Log("Dialog Ended");
         _UIManager.CloseMenus();
-        DialogActive = false;
 
-        if (Dialog.addQuest)
+        if (Dialog.addQuest && Dialog.QuestIndex == questManager.ActiveQuestID)
         {
             try
             {
-                Quest quest = questManager.QuestDatabase[Dialog.QuestIndex];
-                questManager.quests.Add(quest);
-                questManager.ChangeQuest(quest.QuestID);
+                questManager.AddQuest(Dialog.AddQuestIndex);
             }
             catch(Exception e)
             {
@@ -107,7 +108,22 @@ public class DialogManager : MonoBehaviour
             }
 
         }
-        
+
+        if (Dialog.NpcCancompleteQuest && Dialog.QuestIndex == questManager.ActiveQuestID)
+        {
+            try
+            {
+                questManager.SendQuestCompletionRequest(Dialog.QuestIndex);
+                Debug.Log("Npc request send");
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+
+        DialogActive = false;
         page = 0;
     }
 }

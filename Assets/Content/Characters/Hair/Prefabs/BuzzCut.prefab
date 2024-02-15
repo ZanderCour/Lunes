@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &581485012929284253
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3322226569940627701}
+  - component: {fileID: 2519667750412211547}
+  - component: {fileID: 7380217387540526076}
+  - component: {fileID: 4226763888505423967}
+  - component: {fileID: 281400850864399174}
+  m_Layer: 0
+  m_Name: BuzzCut
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3322226569940627701
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581485012929284253}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &2519667750412211547
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581485012929284253}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f87edacf104777c409c83166dd61026d, type: 2}
+  - {fileID: 2100000, guid: f87edacf104777c409c83166dd61026d, type: 2}
+  - {fileID: 2100000, guid: ee7e44a7c4f3440488ae7e3f11e12e00, type: 2}
+  - {fileID: 2100000, guid: ee7e44a7c4f3440488ae7e3f11e12e00, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &7380217387540526076
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581485012929284253}
+  m_Mesh: {fileID: 0}
+--- !u!114 &4226763888505423967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581485012929284253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 286f953cd3775374e8c6e3de8c285aba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HairProfile: {fileID: 11400000, guid: e820569b2e781f94eae44b945b41fd7f, type: 2}
+  useRenderTexture: 0
+  HairBounds:
+    m_Center: {x: 0.0096410215, y: 1.5990138, z: 0.002887927}
+    m_Extent: {x: 0.123845875, y: 0.15661597, z: 0.15782511}
+  needToReload: 0
+--- !u!114 &281400850864399174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581485012929284253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1777cd35fb1b0d4a843a93e5b05c123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  simulationShader: {fileID: 7200000, guid: d03808c0c75cb1344b07aeb871394fd2, type: 3}
+  frameLimit: 200
+  enableSimulation: 1
+  parentTransform: {fileID: 0}
+  speedLimit: 0.15
+  resetDistance: 20
+  collision: 1
+  capsuleColliders:
+  - {fileID: 0}
+  - {fileID: 0}
+  windDirection: {x: 0, y: 0, z: 0}
+  windMagnitude: 0
+  windConeAngle: 40
+  pulseMagnitude: 0
+  pulseFrequency: 0
+  windTurbulence: 0
+  useWindZone: 0
+  windZone: {fileID: 0}
+  doIntegrationAndGlobalShapeConstraints: 1
+  doVSP: 1
+  doLocalShapeConstraints: 1
+  doLengthConstraintsWindAndCollision: 1
+  followHairs: 1
+  globalTransformMatrix:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1

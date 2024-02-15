@@ -9,7 +9,7 @@ public class GunClass : ScriptableObject
     public float fireRate;
     public float reloadTime;
     public int damage;
-    public float recoil;
+    public Vector3 recoilPattern;
     public float shake;
     public bool Automatic;
     public float bulletSpeed;
