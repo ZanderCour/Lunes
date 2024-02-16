@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
 
     public KeyCode Slot1;
     public KeyCode Slot2;
+    public KeyCode Slot3;
+    public KeyCode ToggleHandsKey;
 
     [Header("Movement")]
     [SerializeField] private float LocomotionAcceleration;
@@ -33,6 +35,15 @@ public class PlayerController : MonoBehaviour
 
     [Header("Info")]
     public bool CanControll;
+    public enum ActiveItem
+    {
+        hands,
+        rifle,
+        pisotl,
+        sword
+    };
+
+    public ActiveItem activeItem = ActiveItem.hands;
 
     [Header("Components")]
     private CharacterController characterController;
@@ -41,7 +52,7 @@ public class PlayerController : MonoBehaviour
     public List<GameObject> ItemLoadout = new List<GameObject>();
     public Transform ItemContainer;
     public int slotIndex;
-    public int itemsCount;
+    public int itemsCount = 2;
 
     [Header("Vectors")]
     Vector3 moveVelocity;
@@ -72,6 +83,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float deceleration = 0.5f;
     [SerializeField] private float LocomotionanimatorFloat;
     [SerializeField] private float CrouchLocomotionanimatorFloat;
+    [SerializeField] private float AimLayerWeight;
 
     [Header("Settings")]
     public float Sensitivity;
@@ -279,23 +291,33 @@ public class PlayerController : MonoBehaviour
     //Handles the player aiming and the rotation for the player for each weapon
     private void HandleAiming()
     {
-        aimCamera.gameObject.SetActive(actionState == ActionState.isAiming);
-        GunController gunController = GetComponent<GunController>();
+        if (activeItem == ActiveItem.rifle || activeItem == ActiveItem.pisotl)
+        {
+            aimCamera.gameObject.SetActive(actionState == ActionState.isAiming);
+            GunController gunController = GetComponent<GunController>();
 
-        if (Input.GetKey(KeyCode.Mouse1) && isGrounded)
-        {
-            actionState = ActionState.isAiming;
+            if (Input.GetKey(KeyCode.Mouse1) && isGrounded)
+            {
+                actionState = ActionState.isAiming;
+            }
+            else if (!Input.GetKey(KeyCode.Mouse1) || !isGrounded)
+            {
+                actionState = ActionState.none;
+            }
+
+            //AimDirection
+            if (actionState == ActionState.isAiming || gunController.isShooting)
+            {
+                RotateToAim();
+            }
         }
-        else if(!Input.GetKey(KeyCode.Mouse1) || !isGrounded)
+        else
         {
+            aimCamera.gameObject.SetActive(false);
             actionState = ActionState.none;
         }
+            
 
-        //AimDirection
-        if(actionState == ActionState.isAiming || gunController.isShooting)
-        {
-            RotateToAim();
-        }
     }
     //------------------------------------
 
@@ -322,34 +344,72 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(Slot1)) {
             slotIndex = 1;
+            UpdateHeldItem();
         }
-
         if (Input.GetKeyDown(Slot2)) {
             slotIndex = 2;
+            UpdateHeldItem();
         }
+        if (Input.GetKeyDown(Slot3)) {
+            slotIndex = 3;
+            UpdateHeldItem();
+        }
+        if (Input.GetKeyDown(ToggleHandsKey)) {
+            slotIndex = 0;
+            UpdateHeldItem();
+        }
+
+        if(Input.GetAxisRaw("Mouse ScrollWheel") > 0 || Input.GetAxisRaw("Mouse ScrollWheel") < 0)
+            UpdateHeldItem();
 
         if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
         {
-            //wheel goes up
             slotIndex += 1;
+
+            if (slotIndex > itemsCount)
+                slotIndex = 0;
         }
         else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
-            //wheel goes down
             slotIndex -= 1;
+
+            if (slotIndex < 0)
+                slotIndex = itemsCount;
+        }
+    }
+
+    void UpdateHeldItem()
+    {
+        GunController gunController = GetComponent<GunController>();
+        for (int i = 0; i < ItemLoadout.Count; i++) {
+            ItemLoadout[i].SetActive(false);
         }
 
-        
-        if(slotIndex > itemsCount) 
+        if (ItemLoadout.Count > slotIndex)
         {
-            slotIndex = itemsCount;
-        } 
-
-        if(slotIndex < itemsCount)
+            ItemLoadout[slotIndex].SetActive(true);
+            gunController.UpdateHeldItem(slotIndex);
+        }
+        else
         {
-            slotIndex = 1;
+            ItemLoadout[0].SetActive(true);
+            gunController.UpdateHeldItem(0);
         }
 
+
+
+        if (gunController.HeldItem.type == GunClass.WeaponType.Pistol)
+        {
+            activeItem = ActiveItem.pisotl;
+        }
+        else if (gunController.HeldItem.type == GunClass.WeaponType.Rifle)
+        {
+            activeItem = ActiveItem.rifle;
+        }
+        else if (gunController.HeldItem.ItemName == "Hands")
+        {
+            activeItem = ActiveItem.hands;
+        }
     }
     //------------------------------------
 
@@ -420,6 +480,7 @@ public class PlayerController : MonoBehaviour
             HandleCrouchAnimation();
         }
 
+
         //Animator Values
         //-----------------------------------------------------------------------------------
         animator.SetFloat("Movement", LocomotionanimatorFloat);
@@ -429,6 +490,27 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("Moving", movementState != MovementState.isIdle);
         animator.SetBool("Aim", actionState == ActionState.isAiming);
         //-----------------------------------------------------------------------------------
+
+
+        //Animator Layer Weights
+        //-----------------------------------------------------------------------------------
+        if (activeItem == ActiveItem.hands)
+        {
+            LerpAnimatorLayer(1, 0, 3);
+        }
+        else
+        {
+            LerpAnimatorLayer(1, 1, 3);
+
+        }
+        //-----------------------------------------------------------------------------------
+    }
+
+    private void LerpAnimatorLayer(int layerIndex, float target, float speedMultiplier)
+    {
+        float currentWeight = animator.GetLayerWeight(layerIndex);
+        float weight = Mathf.Lerp(currentWeight, target, (LocomotionDecceleration / 2) * speedMultiplier * Time.deltaTime);
+        animator.SetLayerWeight(layerIndex, weight);
     }
     //------------------------------------
 
@@ -437,21 +519,31 @@ public class PlayerController : MonoBehaviour
     //WeaponRig
     private void HandleRigWeight()
     {
-        //Weapon rig
-        GunController gunController = GetComponent<GunController>();
-        if (actionState == ActionState.isAiming || gunController.isShooting) {
-            LerpRig(1, 5, RifleAimRig);
-            LerpRig(0, 5, RifleHolsterRig);
-        }
+        //Rifle Rig
+        if (activeItem == ActiveItem.rifle)
+        {
+            //Weapon rig
+            GunController gunController = GetComponent<GunController>();
+            if (actionState == ActionState.isAiming || gunController.isShooting)
+            {
+                LerpRig(1, 5, RifleAimRig);
+                LerpRig(0, 5, RifleHolsterRig);
+            }
 
-        //If idle 
-        if (actionState != ActionState.isAiming && !gunController.isShooting) {
+            //If idle 
+            if (actionState != ActionState.isAiming && !gunController.isShooting)
+            {
+                LerpRig(0, 5, RifleAimRig);
+                LerpRig(1, 5, RifleHolsterRig);
+            }
+        }
+        else if (activeItem == ActiveItem.hands)
+        {
             LerpRig(0, 5, RifleAimRig);
-            LerpRig(1, 5, RifleHolsterRig);
+            LerpRig(0, 5, RifleHolsterRig);
         }
     }
     //------------------------------------
-
 
 
     //AimRig
@@ -460,7 +552,6 @@ public class PlayerController : MonoBehaviour
         rig.weight = Mathf.Lerp(rig.weight, target, (LocomotionDecceleration / 2) * speedMultiplier * Time.deltaTime);
     }
     //------------------------------------
-
 
 
     //Movement Animations 

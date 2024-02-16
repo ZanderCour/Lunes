@@ -10,6 +10,7 @@ public class GunController : MonoBehaviour
     public float recoilLerpSpeed = 5f;
     public Transform gunRoot;
     public Camera cam;
+    public int MaxLoadoutCapasity = 3;
 
     public CinemachineImpulseSource impulseSource;
 
@@ -17,8 +18,9 @@ public class GunController : MonoBehaviour
     public GameObject hitPrefab;
 
     public GunClass[] ClassLibary;
-    public GunClass Class;
+    public GunClass HeldItem;
     public int classIndex;
+    public List<GunClass> ActiveItems = new List<GunClass>();
 
     public string Name;
     private float fireRate;
@@ -43,31 +45,43 @@ public class GunController : MonoBehaviour
 
     private void Start()
     {
-        UpdateClass(0);
+        AddItem(0);
+        AddItem(1);
     }
 
-    public void UpdateClass(int index)
+    public void UpdateHeldItem(int index)
     {
-        Class = ClassLibary[index];
-        fireRate = Class.fireRate;
-        reloadTime = Class.reloadTime;
-        damage = Class.damage;
-        recoilPattern = Class.recoilPattern;
-        shake = Class.shake;
-        Automatic = Class.Automatic;
-        bulletSpeed = Class.bulletSpeed;
+        HeldItem = ActiveItems[index];
+        Name = HeldItem.ItemName;
+        fireRate = HeldItem.fireRate;
+        reloadTime = HeldItem.reloadTime;
+        damage = HeldItem.damage;
+        recoilPattern = HeldItem.recoilPattern;
+        shake = HeldItem.shake;
+        Automatic = HeldItem.Automatic;
+        bulletSpeed = HeldItem.bulletSpeed;
 
         //muzzleFlash = Class.muzzleFlash;
         //sound = Class.sound;
-        bullet = Class.bullet;
+        bullet = HeldItem.bullet;
 
-        WeaponPrefab = Class.WeaponPrefab;
+        WeaponPrefab = HeldItem.WeaponPrefab;
+    }
+
+    public void AddItem(int index)
+    {
+        ActiveItems.Add(ClassLibary[index]);
     }
 
     private void Update()
     {
         isShooting = Input.GetKey(FireKey);
         canShoot = Time.time > nextFireTime;
+
+
+        PlayerController player = GetComponent<PlayerController>();
+        if (player.activeItem == PlayerController.ActiveItem.hands)
+            return;
 
         if (Automatic)
         {

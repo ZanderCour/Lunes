@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Weapon", menuName = "Weapon System/Weapon")]
 public class GunClass : ScriptableObject
 {
-    [SerializeField] private string Name { get;  set; }
+    [SerializeField] public string ItemName;
     public float fireRate;
     public float reloadTime;
     public int damage;
@@ -23,8 +23,8 @@ public class GunClass : ScriptableObject
     public enum WeaponType
     {
         Pistol,
-        Light,
-        Heavy,
+        Rifle,
+        Sword,
         Meele
     };
 

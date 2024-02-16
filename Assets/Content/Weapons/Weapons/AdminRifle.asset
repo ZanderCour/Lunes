@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9300a4b56af75e4db6c020bc326b5aa, type: 3}
   m_Name: AdminRifle
   m_EditorClassIdentifier: 
+  ItemName: Destroyer
   fireRate: 0.01
   reloadTime: 0.1
   damage: 9999
-  recoil: 3
+  recoilPattern: {x: 0, y: 0, z: 0}
   shake: 2
   Automatic: 0
   bulletSpeed: 25
@@ -24,4 +25,4 @@ MonoBehaviour:
   bullet: {fileID: 824455350888044533, guid: ef929ab738890d64caf8cb8a74048ddf, type: 3}
   WeaponPrefab: {fileID: 1135244176832436708, guid: 6e7c0b3839f77bd4ebecdbff379eaf0b,
     type: 3}
-  type: 2
+  type: 1
