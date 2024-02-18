@@ -28,5 +28,7 @@ public class GunClass : ScriptableObject
         Meele
     };
 
-    public WeaponType type = new WeaponType();
+    public WeaponType weaponType = new WeaponType();
+    public bool HitScan;
+
 }

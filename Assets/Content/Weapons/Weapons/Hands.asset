@@ -25,4 +25,5 @@ MonoBehaviour:
   bullet: {fileID: 824455350888044533, guid: ef929ab738890d64caf8cb8a74048ddf, type: 3}
   WeaponPrefab: {fileID: 1135244176832436708, guid: 6e7c0b3839f77bd4ebecdbff379eaf0b,
     type: 3}
-  type: 3
+  weaponType: 3
+  HitScan: 0

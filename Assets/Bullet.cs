@@ -7,19 +7,22 @@ public class Bullet : MonoBehaviour
     [HideInInspector] public int Damage;
     [SerializeField] private Vector3 BoxSize;
     public LayerMask layerMask;
+    bool dealtDamage = false;
+
+    public bool HitScan;
 
     private void FixedUpdate()
     {
         Vector3 direction = transform.forward;
         RaycastHit hit;
 
+
         if (Physics.BoxCast(transform.position, BoxSize / 2, direction, out hit, Quaternion.identity, Mathf.Infinity, layerMask))
         {
             if (hit.transform.GetComponent<Health>()) {
-                bool dealtDamage = false;
                 Health hitHealthSystem = hit.transform.GetComponent<Health>();
 
-                if(!dealtDamage)
+                if(!dealtDamage && !HitScan)
                     hitHealthSystem.TakeDamage(Damage);
 
                 dealtDamage = true;

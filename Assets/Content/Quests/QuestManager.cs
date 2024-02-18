@@ -7,6 +7,8 @@ using System.Collections;
 
 public class QuestManager : MonoBehaviour
 {
+    private DebugConsole Console;
+
     public List<Quest> QuestDatabase = new List<Quest>();
 
     public List<Quest> quests = new List<Quest>();
@@ -25,6 +27,7 @@ public class QuestManager : MonoBehaviour
 
     private void Start()
     {
+        Console = GetComponent<DebugConsole>();
         AddQuest(0);
     }
 
@@ -67,19 +70,19 @@ public class QuestManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Quest Failed This quest has allready been completed");
+                Console.WriteMessage("Quest Failed This quest has allready been completed");
             }
         }
         else
         {
-            Debug.Log("Quest Failed This quest has not been loaded to the current active quests");
+            Console.WriteMessage("Quest Failed This quest has not been loaded to the current active quests");
         }
     }
 
     private void CompleteQuest(int id) {
         quests[id].Complete = true;
         string message = "Quest completed " + id;
-        Debug.Log(message);
+        Console.WriteMessage(message);
         QuestWaypoint waypointSystem = FindObjectOfType<QuestWaypoint>();
         waypointSystem.questTarget = null;
         //Add rewards
@@ -178,7 +181,7 @@ public class QuestManager : MonoBehaviour
 
                 ActiveQuestID = index;
                 questLocation = Quests[ActiveQuestID].GetComponent<Transform>().position;
-                Debug.Log("Active quest changed to : " + index);
+                Console.WriteMessage("Active quest changed to : " + index);
 
 
 
@@ -211,7 +214,7 @@ public class QuestManager : MonoBehaviour
                     quests.Add(QuestDatabase[i]);
                     //ChangeQuest(i);
                     quests[i].Complete = false;
-                    Debug.Log("Added quest " + ActiveQuestID);
+                    Console.WriteMessage("Added quest " + ActiveQuestID);
                 }
             }
         }

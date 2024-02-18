@@ -5,14 +5,18 @@ using Cinemachine;
 
 public class UIManager : MonoBehaviour
 {
+    public KeyCode ToggleConsoleKey = KeyCode.F1;
     public GameObject[] Menus;
     public bool PauseMenuOpen;
+    public bool ConsoleOverlayActive;
     public bool DialogMenuOpen;
     [SerializeField] private QuestManager questManager;
 
     public PlayerController player;
 
     public CinemachineBrain camController;
+
+    public GameObject ConsoleOverlay;
 
     private void Start()
     {
@@ -24,12 +28,15 @@ public class UIManager : MonoBehaviour
         if (DialogMenuOpen || !player.isGrounded)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            if (!PauseMenuOpen) {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (!PauseMenuOpen)
+            {
                 PauseMenuOpen = true;
                 Menus[0].SetActive(true);
             }
-            else {
+            else
+            {
                 PauseMenuOpen = false;
                 CloseMenus();
 
@@ -38,15 +45,29 @@ public class UIManager : MonoBehaviour
 
         Cursor.visible = true ? PauseMenuOpen : Cursor.visible = false;
 
-        if (PauseMenuOpen) {
+        if (PauseMenuOpen || ConsoleOverlayActive)
+        {
             Cursor.lockState = CursorLockMode.None;
             camController.enabled = false;
             player.CanControll = false;
         }
-        else {
+        else if(!PauseMenuOpen && !ConsoleOverlayActive)
+        {
             Cursor.lockState = CursorLockMode.Locked;
             player.CanControll = true;
             camController.enabled = true;
+        }
+
+        if (Input.GetKeyDown(ToggleConsoleKey))
+        {
+            if (!ConsoleOverlayActive) {
+                ConsoleOverlayActive = true;
+            }
+            else {
+                ConsoleOverlayActive = false;
+            }
+
+            ConsoleOverlay.SetActive(ConsoleOverlayActive);
         }
     }
 

@@ -398,11 +398,11 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if (gunController.HeldItem.type == GunClass.WeaponType.Pistol)
+        if (gunController.HeldItem.weaponType == GunClass.WeaponType.Pistol)
         {
             activeItem = ActiveItem.pisotl;
         }
-        else if (gunController.HeldItem.type == GunClass.WeaponType.Rifle)
+        else if (gunController.HeldItem.weaponType == GunClass.WeaponType.Rifle)
         {
             activeItem = ActiveItem.rifle;
         }

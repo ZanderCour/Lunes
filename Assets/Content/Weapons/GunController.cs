@@ -5,6 +5,8 @@ using Cinemachine;
 
 public class GunController : MonoBehaviour
 {
+    private DebugConsole Console;
+
     [Header("Settings")]
     public KeyCode FireKey;
     public float recoilLerpSpeed = 5f;
@@ -45,6 +47,8 @@ public class GunController : MonoBehaviour
 
     private void Start()
     {
+        Console = FindObjectOfType<DebugConsole>();
+
         AddItem(0);
         AddItem(1);
     }
@@ -60,12 +64,14 @@ public class GunController : MonoBehaviour
         shake = HeldItem.shake;
         Automatic = HeldItem.Automatic;
         bulletSpeed = HeldItem.bulletSpeed;
-
+        Hitscan = HeldItem.HitScan;
         //muzzleFlash = Class.muzzleFlash;
         //sound = Class.sound;
         bullet = HeldItem.bullet;
 
         WeaponPrefab = HeldItem.WeaponPrefab;
+
+        Console.WriteMessage("Updated held item " + "Name: " + Name + " Type:" + HeldItem.weaponType);
     }
 
     public void AddItem(int index)
@@ -81,6 +87,9 @@ public class GunController : MonoBehaviour
 
         PlayerController player = GetComponent<PlayerController>();
         if (player.activeItem == PlayerController.ActiveItem.hands)
+            return;
+
+        if (!player.CanControll)
             return;
 
         if (Automatic)
@@ -109,29 +118,46 @@ public class GunController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit raycastHit))
         {
             target.transform.position = raycastHit.point;
-            Debug.DrawRay(cam.transform.position, cam.transform.forward, Color.red);
         }
     }
 
     private void Fire()
     {
         Vector3 shootingDirection = gunRoot.forward;
-        GameObject projectile = Instantiate(bullet, gunRoot.position, gunRoot.rotation);
 
+        GameObject projectile = Instantiate(bullet, gunRoot.position, gunRoot.rotation);
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
         projectileRb.velocity = shootingDirection * bulletSpeed;
 
-
-
         Bullet bulletScript = projectile.GetComponent<Bullet>();
+        bulletScript.HitScan = Hitscan;
         bulletScript.Damage = damage;
 
-        nextFireTime = Time.time + fireRate;
+        if (Hitscan)
+        {
+            Ray ray = new Ray(gunRoot.position, shootingDirection);
+            if (Physics.Raycast(ray, out RaycastHit raycastHit))
+            {
+                if (raycastHit.transform.gameObject.GetComponent<Health>())
+                {
+                    Health health = raycastHit.transform.gameObject.GetComponent<Health>();
+                    health.TakeDamage(damage);
+                }
+            }
+        }
 
+        nextFireTime = Time.time + fireRate;
     }
 
     private void HandleRecoil()
     {
+        RaycastHit hit;
+
+        Ray ray = new Ray(transform.position, gunRoot.transform.forward);
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            Debug.DrawRay(gunRoot.transform.position, gunRoot.forward * hit.distance, Color.magenta);
+
+
         if (isShooting && canShoot) 
         {
             // Apply recoil rotation on the gunRoot

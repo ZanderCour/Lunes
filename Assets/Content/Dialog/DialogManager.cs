@@ -8,6 +8,8 @@ using System;
 
 public class DialogManager : MonoBehaviour
 {
+    private DebugConsole Console;
+
     public TextMeshProUGUI dialogText;
     private UIManager _UIManager;
     private QuestManager questManager;
@@ -27,6 +29,7 @@ public class DialogManager : MonoBehaviour
     {
         _UIManager = GetComponentInChildren<UIManager>();
         questManager = GetComponent<QuestManager>();
+        Console = GetComponent<DebugConsole>();
     }
 
     private void Update()
@@ -66,6 +69,7 @@ public class DialogManager : MonoBehaviour
         page = 1;
         DialogActive = true;
         _UIManager.OpenMenuSingle(dialogMenu);
+        Console.WriteMessage("Dialog Started");
     }
 
     public void DisplayNextPage()
@@ -86,14 +90,14 @@ public class DialogManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("No dialog to download");
+            Console.WriteMessage("No dialog to download");
         }
 
     }
 
     private void EndDialog()
     {
-        Debug.Log("Dialog Ended");
+        Console.WriteMessage("Dialog Ended");
         _UIManager.CloseMenus();
 
         if (Dialog.addQuest && Dialog.QuestIndex == questManager.ActiveQuestID)
@@ -114,7 +118,7 @@ public class DialogManager : MonoBehaviour
             try
             {
                 questManager.SendQuestCompletionRequest(Dialog.QuestIndex);
-                Debug.Log("Npc request send");
+                Console.WriteMessage("Npc request send");
             }
             catch (Exception e)
             {
